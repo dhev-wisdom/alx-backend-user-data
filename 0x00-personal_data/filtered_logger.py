@@ -9,7 +9,7 @@ from os import environ
 import re
 from typing import List
 
-PII_FIELDS = ("name", "email", "phone", "ssn", "ip")
+PII_FIELDS = ("name", "email", "phone", "ssn", "password")
 
 
 class RedactingFormatter(logging.Formatter):
@@ -59,21 +59,6 @@ def filter_datum(
 
 
 def get_logger() -> logging.Logger:
-    """
-    returns a logging.Logger object.
-    """
-    logger = logging.get_logger("user_data")
-    logger.setLevel(logging.INFO)
-    logger.propagate = False
-
-    handler = StreamHandler()
-    handler.setFormatter(RedactingFormatter(PII_FIELDS))
-    logger.addHandler(handler)
-
-    return logger
-
-
-def get_logger() -> logging.Logger:
     """ Returns a Logger Object """
     logger = logging.getLogger("user_data")
     logger.setLevel(logging.INFO)
@@ -91,10 +76,10 @@ def get_db():
     """
     function returns a connector to the database
     """
-    db_name = environ.get("PERSONAL_DATA_DB_NAME")
-    db_user = environ.get("PERSONAL_DATA_DB_USERNAME")
-    db_pass = environ.get("PERSONAL_DATA_DB_PASSWORD")
-    db_host = environ.get("PERSONAL_DATA_DB_HOST")
+    db_name = environ.get("PERSONAL_DATA_DB_NAME") or "root"
+    db_user = environ.get("PERSONAL_DATA_DB_USERNAME") or "root"
+    db_pass = environ.get("PERSONAL_DATA_DB_PASSWORD") or ""
+    db_host = environ.get("PERSONAL_DATA_DB_HOST") or "localhost"
 
     connection = mysql.connector.connection.MySQLConnection(
             host=db_host,
