@@ -76,15 +76,15 @@ def get_db():
     """
     function returns a connector to the database
     """
-    db_name = environ.get("PERSONAL_DATA_DB_NAME") or "root"
+    db_name = environ.get("PERSONAL_DATA_DB_NAME")
     db_user = environ.get("PERSONAL_DATA_DB_USERNAME") or "root"
     db_pass = environ.get("PERSONAL_DATA_DB_PASSWORD") or ""
     db_host = environ.get("PERSONAL_DATA_DB_HOST") or "localhost"
 
-    connection = mysql.connector.connection.MySQLConnection(
+    cnx = mysql.connector.connection.MySQLConnection(
             host=db_host,
-            user=db_user,
-            password=db_pass,
+            username=db_user,
+            passwd=db_pass,
             database=db_name
             )
-    return connection
+    return cnx
