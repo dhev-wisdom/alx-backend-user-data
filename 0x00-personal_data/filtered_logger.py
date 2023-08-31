@@ -9,7 +9,7 @@ from os import environ
 import re
 from typing import List
 
-PII_FIELDS = ("name", "email", "phone", "ssn", "password")
+PII_FIELDS = ("name", "email", "phone", "password", "ssn")
 
 
 class RedactingFormatter(logging.Formatter):
@@ -25,13 +25,10 @@ class RedactingFormatter(logging.Formatter):
         self.fields = fields
 
     def format(self, record: logging.LogRecord) -> str:
-        """
-        format method to filter values in incoming log records
-        using filter_datum
-        """
-        record.msg = filter_datum(self.fields, self.REDACTION,
-                                  record.getMessage(), self.SEPARATOR)
-        return super(RedactingFormatter, self).format(record)
+        """format method to filter values in incoming log records"""
+        message = super().format(record)
+        return filter_datum(self.fields, self.REDACTION,
+                            message, self.SEPARATOR)
 
 
 def filter_datum(
@@ -86,21 +83,15 @@ def get_db():
             username=db_user,
             passwd=db_pass,
             database=db_name
-            )
+    )
     return cnx
+
 
 def main() -> None:
     """
     obtain a database connection using get_db and retrieve all rows
     in the users table nd display each row under a filtered format
     """
-    """
-    cnx = get_db()
-    for row in cnx:
-        print(filter_datum(["name", "password", "email", "phone", "ssn"],
-                           "***", row, ";"))
-    """
-
     logger = get_logger()
     db = get_db()
     cursor = db.cursor()
