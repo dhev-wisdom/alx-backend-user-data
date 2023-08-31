@@ -3,18 +3,13 @@
 Module returns obfuscated log message
 """
 
-import msql.connector
+import mysql.connector
 import logging
 from os import environ
 import re
 from typing import List
 
 PII_FIELDS = ("name", "email", "phone", "ssn", "ip")
-
-db_name = environ.get("PERSONAL_DATA_DB_NAME")
-db_user = environ.get("PERSONAL_DATA_DB_USERNAME")
-db_pass = environ.get("PERSONAL_DATA_DB_PASSWORD")
-db_host = environ.get("PERSONAL_DATA_DB_HOST")
 
 
 class RedactingFormatter(logging.Formatter):
@@ -84,8 +79,9 @@ def get_logger() -> logging.Logger:
     logger.setLevel(logging.INFO)
     logger.propagate = False
 
+    formatter = RedactingFormatter(PII_FIELDS)
     stream_handler = logging.StreamHandler()
-    stream_handler.setFormatter(RedactingFormatter(list(PII_FIELDS)))
+    stream_handler.setFormatter(formatter)
     logger.addHandler(stream_handler)
 
     return logger
@@ -95,7 +91,12 @@ def get_db():
     """
     function returns a connector to the database
     """
-    connection = mysql.connector.connect(
+    db_name = environ.get("PERSONAL_DATA_DB_NAME")
+    db_user = environ.get("PERSONAL_DATA_DB_USERNAME")
+    db_pass = environ.get("PERSONAL_DATA_DB_PASSWORD")
+    db_host = environ.get("PERSONAL_DATA_DB_HOST")
+
+    connection = mysql.connector.connection.MySQLConnection(
             host=db_host,
             user=db_user,
             password=db_pass,
