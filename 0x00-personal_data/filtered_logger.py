@@ -41,8 +41,7 @@ def filter_datum(
     Return:
         log messsage (message)
     """
-    password_pattern = r"password([^;]+;)"
-    dob_pattern = r"date_of_birth([^;]+;)"
-    message_ = re.sub(password_pattern, f"password={redaction};", message)
-    message_ = re.sub(dob_pattern, f"date_of_birth={redaction};", message_)
-    return message_
+    for field in fields:
+        message = re.sub(f"{field}=(.*?){seperator}",
+                         f"{field}={redaction}{seperator}", message)
+    return message
