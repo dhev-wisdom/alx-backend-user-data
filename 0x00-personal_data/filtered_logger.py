@@ -88,3 +88,32 @@ def get_db():
             database=db_name
             )
     return cnx
+
+def main() -> None:
+    """
+    obtain a database connection using get_db and retrieve all rows
+    in the users table nd display each row under a filtered format
+    """
+    """
+    cnx = get_db()
+    for row in cnx:
+        print(filter_datum(["name", "password", "email", "phone", "ssn"],
+                           "***", row, ";"))
+    """
+
+    logger = get_logger()
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM users")
+    fields = cursor.column_names
+
+    for row in cursor:
+        message = "".join("{}={};".format(k, v) for k, v in zip(fields, row))
+        logger.info(message.strip())
+
+    cursor.close()
+    db.close()
+
+
+if __name__ == "__main__":
+    main()
