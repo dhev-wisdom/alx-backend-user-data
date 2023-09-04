@@ -29,6 +29,14 @@ def not_found_(error) -> str:
     return response
 
 
+@app.errorhandler(403)
+def not_found__(error) -> str:
+    """Error 403 handler"""
+    response = jsonify({"error": "Forbidden"})
+    response.status_code = 403
+    return response
+
+
 if __name__ == "__main__":
     host = getenv("API_HOST", "0.0.0.0")
     port = getenv("API_PORT", "5000")
