@@ -24,7 +24,9 @@ class BasicAuth(Auth):
         if path[-1] != "/":
             path += "/"
         for path_ in excluded_paths:
-            if path_[:-1] == path[:-1] and path_[-1] == "*":
+            if path_[-1] != "/":
+                path_ += "/"
+            if path_[:-2] == path[:-2] and path_[-2] == "*":
                 return False
         return True
 
