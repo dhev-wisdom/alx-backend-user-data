@@ -6,6 +6,7 @@ Authentification Module
 from api.v1.auth.auth import Auth
 import base64
 from flask import request
+import fnmatch
 from models.user import User
 from typing import List, TypeVar
 
@@ -21,12 +22,8 @@ class BasicAuth(Auth):
             len(excluded_paths) < 1
         ):
             return True
-        if path[-1] != "/":
-            path += "/"
         for path_ in excluded_paths:
-            if path_[-1] != "/":
-                path_ += "/"
-            if path_[:-2] == path[:-2] and path_[-2] == "*":
+            if fnmatch.fnmatch(path, path_):
                 return False
         return True
 
