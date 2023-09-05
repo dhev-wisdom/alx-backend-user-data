@@ -4,6 +4,7 @@ Authentification Module
 """
 
 from flask import request
+import fnmatch
 from typing import List, TypeVar
 
 
@@ -18,10 +19,9 @@ class Auth():
             len(excluded_paths) < 1
         ):
             return True
-        if path[-1] != "/":
-            path += "/"
+
         for path_ in excluded_paths:
-            if path_ == path:
+            if fnmatch.fnmatch(path, path_):
                 return False
         return True
 
@@ -29,9 +29,7 @@ class Auth():
         """authorization header"""
         if request is None:
             return None
-        if request.headers.get("Authorization"):
-            return request.headers.get("Authorization")
-        return None
+        return request.headers.get("Authorization", None)
 
     def current_user(self, request=None) -> TypeVar('User'):
         """method to find the current user"""
