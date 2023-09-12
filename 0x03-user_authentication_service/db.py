@@ -3,6 +3,8 @@
 """
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.exc import InvalidRequestError
+from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
 
@@ -39,3 +41,28 @@ class DB:
         self._session.commit()
 
         return new_user
+
+    def find_user_by(self, **kwargs) -> User:
+        """
+        find user by provided argument
+        raise NoResultFound exception if user with argument value not found
+        raise InvalidRequestError exception if parameter doesn't exist
+        in database
+        """
+        if not kwargs:
+            raise InvalidRequestError
+        for column, value in kwargs.items():
+            try:
+                column_attr = getattr(User, column)
+            except AttributeError:
+                raise InvalidRequestError
+
+        try:
+            user = self._session.query(User).filter_by(**kwargs).first()
+        except InvalidRequestError:
+            raise InvalidRequestError
+
+        if not user or user is None:
+            raise NoResultFound
+
+        return user
