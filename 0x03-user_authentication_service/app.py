@@ -3,7 +3,7 @@
 Basic Flask App
 """
 
-from flask import Flask, jsonify, request, make_response
+from flask import Flask, jsonify, request
 from auth import Auth
 
 AUTH = Auth()
@@ -32,8 +32,7 @@ def users():
         except ValueError:
             res = {"message": "email already registered"}
             status_code = 400
-            response = make_response(res, status_code)
-            return response
+            return jsonify(res), status_code
 
 
 if __name__ == "__main__":

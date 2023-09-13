@@ -28,7 +28,7 @@ class Auth:
 
     def register_user(self, email: str, password: str) -> User:
         """
-        pass
+        register user
         """
         try:
             user = self._db.find_user_by(email=email)
@@ -39,3 +39,15 @@ class Auth:
             self._db.add_user(email, hashed_password)
 
         return user
+
+    def valid_login(self, email: str, password: str) -> bool:
+        """
+        validate login
+        """
+        try:
+            user = self._db.find_user_by(email=email)
+            if bcrypt.checkpw(password.encode(), user.hashed_password):
+                return True
+        except NoResultFound:
+            return False
+        return False
