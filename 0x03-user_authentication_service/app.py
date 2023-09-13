@@ -3,8 +3,10 @@
 Basic Flask App
 """
 
-from flask import Flask, jsonify, request
-from auth import Auth
+from flask import Flask, jsonify, request, abort
+from auth import Auth, _hash_password
+from sqlalchemy.exc import NoResultFound
+from user import User
 
 AUTH = Auth()
 
@@ -33,6 +35,21 @@ def users():
             res = {"message": "email already registered"}
             status_code = 400
             return jsonify(res), status_code
+
+@app.route("/sessions", strict_slashes=False, methods=["POST"])
+def login():
+    """login function"""
+    email = request.form.get("email")
+    password = request.form.get("password")
+    
+    if AUTH.valid_login(email, password):
+        session_id = AUTH.create_session(email)
+        response = jsonify({"email": email, "message": "logged in"})
+        response.set_cookie("session_id", session_id)
+        return response
+    else:
+        abort(401)
+    
 
 
 if __name__ == "__main__":
