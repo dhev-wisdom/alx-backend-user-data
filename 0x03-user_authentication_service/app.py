@@ -60,10 +60,24 @@ def logout():
     destroy session
     """
     session_id = request.cookies.get("session_id")
-    user = AUTH,get_user_from_session_id(session_id)
+    user = AUTH.get_user_from_session_id(session_id)
     if user:
         AUTH.destroy_session(user.id)
         return redirect(url_for('home'))
+    abort(403)
+
+@app.route("/profile", strict_slashes=False, methods=["GET"])
+def profile():
+    """
+    check if user exists (by session id) and return user email
+    """
+    session_id = request.cookies.get("session_id")
+    if session_id == None:
+        abort(403)
+    user = AUTH.get_user_from_session_id(session_id)
+    if user:
+        response = {"email": user.email}
+        return jsonify(response)
     abort(403)
 
 
