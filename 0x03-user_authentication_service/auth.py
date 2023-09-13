@@ -6,6 +6,7 @@ Hashing passwordwith bcrypt
 from db import DB
 import bcrypt
 from user import User
+import uuid
 from sqlalchemy.exc import NoResultFound
 
 
@@ -14,6 +15,13 @@ def _hash_password(password):
     returns a hashed byte that represents password
     """
     return bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+
+
+def _generate_uuid() -> str:
+    """
+    generate a new uuid
+    """
+    return str(uuid.uuid4())
 
 
 class Auth:
@@ -51,3 +59,15 @@ class Auth:
         except NoResultFound:
             return False
         return False
+
+    def create_session(self, email: str) -> str:
+        """
+        create session
+        """
+        try:
+            user = self._db.find_user_by(email=email)
+            uuid_ = _generate_uuid()
+            self._db.update_user(user_id=user.id, session_id=uuid_)
+            return uuid_
+        except NoResultFound:
+            pass
