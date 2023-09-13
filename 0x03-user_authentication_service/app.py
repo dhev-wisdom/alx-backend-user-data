@@ -3,12 +3,14 @@
 Basic Flask App
 """
 
-from flask import Flask, jsonify, request, abort
+from flask import Flask, jsonify, request, abort, redirect
 from auth import Auth, _hash_password
+from db import DB
 from sqlalchemy.exc import NoResultFound
 from user import User
 
 AUTH = Auth()
+DB = DB()
 
 app = Flask(__name__)
 
@@ -50,6 +52,19 @@ def login():
         return response
     else:
         abort(401)
+
+@app.route("/sessions", strict_slashes=False, methods=["DELETE"])
+def logout():
+    """
+    logout function
+    destroy session
+    """
+    session_id = request.cookies.get("session_id")
+    user = AUTH,get_user_from_session_id(session_id)
+    if user:
+        AUTH.destroy_session(user.id)
+        return redirect(url_for('home'))
+    abort(403)
 
 
 if __name__ == "__main__":
