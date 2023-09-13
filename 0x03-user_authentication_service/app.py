@@ -3,7 +3,7 @@
 Basic Flask App
 """
 
-from flask import Flask, jsonify, request, abort, redirect
+from flask import Flask, jsonify, request, abort, redirect, url_for
 from auth import Auth, _hash_password
 from db import DB
 from sqlalchemy.exc import NoResultFound
@@ -91,10 +91,10 @@ def get_reset_password_token():
     """
     email = request.form.get("email")
     try:
-        reset_token = AUTH.get_reset_password_token(email)
+        reset_token = AUTH.generate_reset_password_token(email)
         if not reset_token:
             abort(403)
-        response = {"email": user.email, "reset_token": token}
+        response = {"email": email, "reset_token": reset_token}
         return jsonify(response), 200
     except ValueError:
         abort(403)
@@ -105,14 +105,15 @@ def update_password():
     """
     update user password
     """
-    email, reset_token = request.form.get("email"), request.form.get("reset_token")
+    email = request.form.get("email")
+    reset_token = request.form.get("reset_token")
     password = request.form.get("new_password")
     try:
         AUTH.update_password(reset_token, password)
         response = {"email": email, "message": "Password updated"}
         return jsonify(response), 200
     except Exception as e:
-            abort(403)
+        abort(403)
 
 
 if __name__ == "__main__":
