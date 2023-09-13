@@ -80,7 +80,7 @@ def profile():
     user = AUTH.get_user_from_session_id(session_id)
     if user:
         response = {"email": user.email}
-        return jsonify(response)
+        return jsonify(response), 200
     abort(403)
 
 
@@ -90,16 +90,14 @@ def get_reset_password_token():
     get reset password token
     """
     email = request.form.get("email")
-    if not email:
-        print("Email not logged in")
-        abort(403)
     try:
-        user = DB.find_user_by(email=email)
-    except NoResultFound:
+        reset_token = AUTH.get_reset_password_token(email)
+        if not reset_token:
+            abort(403)
+        response = {"email": user.email, "reset_token": token}
+        return jsonify(response), 200
+    except ValueError:
         abort(403)
-    token = uuid.uuid4()
-    response = {"email": user.email, "reset_token": token}
-    return jsonify(response), 200
 
 
 @app.route("/reset_password", strict_slashes=False, methods=["PUT"])
