@@ -71,3 +71,22 @@ class Auth:
             return uuid_
         except NoResultFound:
             pass
+
+    def get_user_from_session_id(self, session_id: str) -> User:
+        """
+        Find user by session id
+        """
+        user = self._db.find_user_by(session_id=session_id)
+        if user is not None:
+            return user
+        return None
+
+    def destroy_session(self, user_id: int) -> None:
+        """
+        removes session_id from user with id user_id
+        """
+        user = self._db.find_user_by(id=user_id)
+        if user:
+            self._db.update_user(user_id=user.id, session_id=None)
+            return None
+        print("Invalid user id. User not found")
