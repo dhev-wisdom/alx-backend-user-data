@@ -36,12 +36,13 @@ def users():
             status_code = 400
             return jsonify(res), status_code
 
+
 @app.route("/sessions", strict_slashes=False, methods=["POST"])
 def login():
     """login function"""
     email = request.form.get("email")
     password = request.form.get("password")
-    
+
     if AUTH.valid_login(email, password):
         session_id = AUTH.create_session(email)
         response = jsonify({"email": email, "message": "logged in"})
@@ -49,7 +50,6 @@ def login():
         return response
     else:
         abort(401)
-    
 
 
 if __name__ == "__main__":
